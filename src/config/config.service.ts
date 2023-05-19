@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { DataSourceOptions } from 'typeorm';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -34,7 +35,7 @@ class ConfigService {
     return mode == 'development' || mode == 'dev' || mode == 'develop';
   }
 
-  public getTypeOrmConfig(): TypeOrmModuleOptions {
+  public getTypeOrmConfig(): DataSourceOptions {
     return {
       type: 'postgres',
       host: this.getValue('PG_HOST'),
@@ -50,7 +51,6 @@ class ConfigService {
       migrations: [__dirname + 'src/migration/*.ts'],
       // autoLoadEntities: true,
       synchronize: true,
-      retryAttempts: 5,
       migrationsRun: true,
       ssl: this.isDevelopment() ? false : { rejectUnauthorized: false },
     };
