@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { TargetServerService } from './target-server.service';
-import { TargetServerController } from './target-server.controller';
+import { TargetServerService } from './services/target-server.service';
+import { TargetServerController } from './controllers/target-server.controller';
 
 @Module({
   providers: [TargetServerService],
-  controllers: [TargetServerController]
+  controllers: [TargetServerController],
 })
 export class TargetServerModule {}
