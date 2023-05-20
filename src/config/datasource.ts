@@ -8,7 +8,7 @@ const connectToDataSource = async () => {
     console.info('datasource successfully initialized');
     return dataSource;
   } catch (error) {
-    console.error('error during datasource initialization');
+    console.error('an error occurred during datasource initialization');
   }
 };
 
