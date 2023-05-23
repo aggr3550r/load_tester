@@ -1,11 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { config } from 'dotenv';
 import {
   Logger,
   UnprocessableEntityException,
   ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
+config();
 
 async function bootstrap() {
   const port = process.env.PORT ? Number(process.env.PORT) : 8086;

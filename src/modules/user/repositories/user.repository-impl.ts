@@ -15,4 +15,8 @@ export class TypeOrmUserRepository
   async findPerson(options: FindOneOptions<User>): Promise<User> {
     return await this.findOne(options);
   }
+
+  async savePerson(user: User) {
+    return await this.save(user);
+  }
 }

@@ -9,6 +9,10 @@ import { UserModule } from './modules/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configService } from './config/config.service';
 import { APP_PIPE } from '@nestjs/core';
+import { UserService } from './modules/user/services/user.service';
+import { UserRepository } from './modules/user/repositories/user.repository';
+import { TypeOrmUserRepository } from './modules/user/repositories/user.repository-impl';
+import { AuthService } from './modules/user/auth/auth.service';
 
 @Module({
   imports: [
@@ -20,6 +24,7 @@ import { APP_PIPE } from '@nestjs/core';
   controllers: [AppController, UserController],
   providers: [
     AppService,
+    UserService,
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
@@ -27,6 +32,11 @@ import { APP_PIPE } from '@nestjs/core';
       }),
     },
     TargetServerService,
+    {
+      provide: UserRepository,
+      useClass: TypeOrmUserRepository,
+    },
+    AuthService,
   ],
 })
 export class AppModule {}

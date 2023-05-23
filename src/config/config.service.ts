@@ -52,7 +52,6 @@ class ConfigService {
       // autoLoadEntities: true,
       synchronize: true,
       migrationsRun: true,
-      ssl: this.isDevelopment() ? false : { rejectUnauthorized: false },
     };
   }
 }

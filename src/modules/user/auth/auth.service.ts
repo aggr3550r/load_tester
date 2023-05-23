@@ -1,10 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import SecurityUtil from '../../../utils/security.util';
 import { Response } from 'express';
 import { AppResponseStatus } from '../../../enums/app-response.enum';
 import { User } from '../entities/user.entity';
 import { UserRepository } from '../repositories/user.repository';
 import { UserService } from '../services/user.service';
+import { RegisterUserDTO } from '../dtos/register-user.dto';
+import { ResponseModel } from '../../../models/ResponseModel';
+import { LoginDTO } from '../dtos/login.dto';
+import { FindOneOptions } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -49,7 +53,55 @@ export class AuthService {
     });
   }
 
-  async register() {}
+  async register(params: RegisterUserDTO): Promise<ResponseModel<User>> {
+    try {
+      let user: User;
+      user.email_address = params.email_address;
 
-  async login() {}
+      const userPassword = await SecurityUtil.encryptPassword(params.password);
+
+      user.password = userPassword;
+
+      const response = await this.userRepository.savePerson(user);
+
+      return new ResponseModel(
+        AppResponseStatus.SUCCESS,
+        'Successfully registered user',
+        response,
+      );
+    } catch (error) {
+      console.error('register() error \n %s', error.toString());
+
+      return new ResponseModel(
+        AppResponseStatus.FAILED,
+        'Error occurred while trying to register user.',
+        null,
+      );
+    }
+  }
+
+  async login(params: LoginDTO) {
+    try {
+      let user = await this.userRepository.findPerson({
+        where: {
+          email_address: params.email_address,
+        },
+      });
+
+      let verifyPasswordResponse = await SecurityUtil.verifyPassword(
+        user,
+        params.password,
+      );
+
+      return verifyPasswordResponse;
+    } catch (error) {
+      console.error('login() error \n %s', error.toString());
+
+      return new ResponseModel(
+        AppResponseStatus.FAILED,
+        'Error occurred while trying to log user into the app.',
+        null,
+      );
+    }
+  }
 }

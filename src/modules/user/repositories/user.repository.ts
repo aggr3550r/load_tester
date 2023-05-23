@@ -3,4 +3,5 @@ import { User } from '../entities/user.entity';
 
 export abstract class UserRepository {
   abstract findPerson(options: FindOneOptions<User>): Promise<User>;
+  abstract savePerson(user: User): Promise<User>;
 }
