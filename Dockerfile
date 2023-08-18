@@ -34,5 +34,5 @@ COPY --from=base /app/node_modules ./node_modules
 # Set the container port
 EXPOSE 80
 
-# Define the command to start the application
+# Define the command to start the applicatiwon
 CMD ["node", "dist/main.js"]
