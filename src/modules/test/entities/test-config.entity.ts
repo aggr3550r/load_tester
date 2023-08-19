@@ -8,3 +8,5 @@ export class TestConfig extends BaseModel {
   @Column({ nullable: false, type: 'jsonb' })
   config: TestConfigDTO;
 }
+
+

@@ -2,6 +2,21 @@ import { group, sleep } from 'k6';
 import http from 'k6/http';
 import { check } from 'k6';
 
+const dotenv = require('dotenv');
+dotenv.config();
+
+const mailjetEmail = require('node-mailjet').apiConnect(
+  process.env.MAILJET_KEY1,
+  process.env.MAILJET_KEY2,
+);
+
+class EmailTemplateConfig {
+  user_name;
+  user_email;
+  subject;
+  variables;
+}
+
 export let options = {
   thresholds: {
     http_req_duration: ['p(95)<500', 'p(99)<1000'],
@@ -31,8 +46,12 @@ const endpoints = [
 const responseTimes = [];
 const virtualUserCounts = [];
 
-export default function () {
+export default async function () {
   // Randomly select an endpoint to test
+
+  // Send Test Begin Notification
+  await sendTestBeginNotification();
+
   const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)];
 
   group('Test Group', function () {
@@ -57,4 +76,39 @@ export default function () {
 
   // Introduce some sleep between requests
   sleep(1); // 1 second
+
+  // Check if the current iteration is the last iteration
+  if (__ITER === options.stages[options.stages.length - 1].iterations - 1) {
+    // Process response times array when the last iteration is reached
+    processResult();
+  }
 }
+
+async function processResult() {
+  sendTestEndNotification();
+}
+
+function getMailJetMessageTransTemplate(user, subject, templateID, variables) {
+  return [
+    {
+      From: {
+        Email: 'support@earn-relai.com',
+        Name: 'EarnRelai',
+      },
+      To: [
+        {
+          Email: user.data.email,
+          Name: user.data.name,
+        },
+      ],
+      Subject: subject,
+      TemplateID: templateID,
+      TemplateLanguage: true,
+      Variables: { ...variables },
+    },
+  ];
+}
+
+async function sendTestBeginNotification() {}
+
+async function sendTestEndNotification() {}
