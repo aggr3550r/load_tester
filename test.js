@@ -15,6 +15,13 @@ class EmailTemplateConfig {
   user_email;
   subject;
   variables;
+
+  constructor(user_name, user_email, subject, variables) {
+    this.user_name = user_name;
+    this.user_email = user_email;
+    this.subject = subject;
+    this.variables = variables;
+  }
 }
 
 export let options = {
@@ -47,11 +54,13 @@ const responseTimes = [];
 const virtualUserCounts = [];
 
 export default async function () {
-  // Randomly select an endpoint to test
+  // Configure essential variables for email template
+  const emailConfig = new EmailTemplateConfig();
 
   // Send Test Begin Notification
-  await sendTestBeginNotification();
+  sendTestBeginNotification();
 
+  // Randomly select an endpoint to test
   const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)];
 
   group('Test Group', function () {
@@ -109,6 +118,35 @@ function getMailJetMessageTransTemplate(user, subject, templateID, variables) {
   ];
 }
 
-async function sendTestBeginNotification() {}
+async function sendEmail(user, subject, templateID, variables) {
+  try {
+    const request = await mailjetEmail
+      .post('send', { version: 'v3.1' })
+      .request({
+        Messages: getMailJetMessageTransTemplate(
+          { name: user.name, email: user.email },
+          subject,
+          templateID,
+          variables,
+        ),
+      });
 
-async function sendTestEndNotification() {}
+    console.log('Email sent', request.body);
+  } catch (e) {
+    console.log('An error occurred while trying to send this email', e);
+  }
+}
+
+async function sendTestBeginNotification(user, subject, templateID, variables) {
+  templateID = 100;
+  subject = 'Strap In, Your Test is Starting...';
+  variables = {};
+  await sendEmail(user, subject, templateID, variables);
+}
+
+async function sendTestEndNotification(user, subject, templateID, variables) {
+  templateID = 200;
+  subject = 'Test Results';
+  variables = {};
+  await sendEmail(user, subject, templateID, variables);
+}
